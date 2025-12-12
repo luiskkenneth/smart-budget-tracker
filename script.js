@@ -14,8 +14,24 @@ const totalIncomeEl = document.getElementById("totalIncome");
 const totalExpenseEl = document.getElementById("totalExpense");
 const totalBalanceEl = document.getElementById("totalBalance");
 
-// Data storage
-let entries = [];
+// ❌ Inalis ang: let entries = []; - Wala na tayong gagamiting lokal na array, server na ang hahawak
+
+// Function to fetch data from the server and update the UI
+async function loadData() {
+    try {
+        const response = await fetch('/api/transactions');
+        if (!response.ok) throw new Error('Failed to fetch transactions');
+        
+        const entries = await response.json(); 
+
+        // I-update ang UI gamit ang data mula sa server
+        updateTotals(entries); 
+        updateHistory(entries); 
+
+    } catch (error) {
+        console.error('Error loading data:', error);
+    }
+}
 
 // Load initial categories
 function loadCategories() {
@@ -33,12 +49,13 @@ function loadCategories() {
 
 // Initial load
 loadCategories();
+loadData(); // 👈 Tiyakin na ito ay tinatawag sa simula!
 
 // Update categories when type changes
 entryType.addEventListener("change", loadCategories);
 
-// Add Entry
-addEntryBtn.addEventListener("click", () => {
+// Add Entry (Binago para gumamit ng POST request sa server)
+addEntryBtn.addEventListener("click", async () => {
     const type = entryType.value;
     const category = entryCategory.value;
     const amount = parseFloat(entryAmount.value);
@@ -49,18 +66,32 @@ addEntryBtn.addEventListener("click", () => {
         return;
     }
 
-    const newEntry = { type, category, amount, date };
-    entries.push(newEntry);
+    const newEntry = { type, category, amount, date }; // Description ay 'N/A' sa server
 
-    updateHistory();
-    updateTotals();
+    try {
+        const response = await fetch('/api/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newEntry)
+        });
 
-    entryAmount.value = "";
-    entryDate.value = "";
+        if (!response.ok) throw new Error('Failed to add transaction');
+        
+        // Pagkatapos mag-save, i-reload ang data para maipakita ang bagong entry
+        await loadData(); 
+        
+        // I-clear ang form
+        entryAmount.value = "";
+        entryDate.value = "";
+        
+    } catch (error) {
+        console.error('Error adding entry:', error);
+        alert("Failed to add entry. Check console.");
+    }
 });
 
-// Update Totals
-function updateTotals() {
+// Update Totals (Tumanggap na ng 'entries' mula sa server)
+function updateTotals(entries) {
     let income = 0;
     let expense = 0;
 
@@ -74,11 +105,11 @@ function updateTotals() {
     totalBalanceEl.textContent = "₱" + (income - expense).toLocaleString();
 }
 
-// Update History Table
-function updateHistory() {
+// Update History Table (Tumanggap na ng 'entries' mula sa server, gumagamit na ng entry.id)
+function updateHistory(entries) {
     historyTable.innerHTML = "";
 
-    entries.forEach((entry, index) => {
+    entries.forEach((entry) => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
@@ -88,7 +119,7 @@ function updateHistory() {
             <td class="p-2">${entry.date}</td>
             <td class="p-2">
                 <button class="bg-red-500 text-white px-2 py-1 rounded"
-                        onclick="deleteEntry(${index})">
+                        onclick="deleteEntry(${entry.id})"> 
                     Delete
                 </button>
             </td>
@@ -98,12 +129,23 @@ function updateHistory() {
     });
 }
 
-// Delete Entry
-function deleteEntry(index) {
-    entries.splice(index, 1);
-    updateHistory();
-    updateTotals();
+// Delete Entry (Binago para gumamit ng DELETE request at entry ID)
+async function deleteEntry(id) {
+    try {
+        const response = await fetch(`/api/transactions/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) throw new Error('Failed to delete transaction');
+        
+        // I-reload ang data pagkatapos mag-delete
+        await loadData();
+
+    } catch (error) {
+        console.error('Error deleting entry:', error);
+    }
 }
 
 // Make functions global for inline onclick
 window.deleteEntry = deleteEntry;
+window.loadData = loadData; // Gawin ding global para sa debug
