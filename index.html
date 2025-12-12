@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Budget Tracker</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <div class="max-w-4xl mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">Smart Budget Tracker</h1>
+
+        <!-- INPUT FORM -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+
+            <h2 class="text-xl font-semibold mb-4">Add Entry</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <!-- TYPE -->
+                <div>
+                    <label class="font-semibold">Type</label>
+                    <select id="entryType" class="input-box">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+
+                <!-- CATEGORY -->
+                <div>
+                    <label class="font-semibold">Category</label>
+                    <select id="entryCategory" class="input-box">
+                        <!-- Populated by script.js depending on type -->
+                    </select>
+                </div>
+
+                <!-- AMOUNT -->
+                <div>
+                    <label class="font-semibold">Amount</label>
+                    <input type="number" id="entryAmount" class="input-box" placeholder="Enter amount" />
+                </div>
+
+                <!-- DATE -->
+                <div>
+                    <label class="font-semibold">Date</label>
+                    <input type="date" id="entryDate" class="input-box" />
+                </div>
+
+            </div>
+
+            <button id="addEntryBtn" class="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                Add Entry
+            </button>
+        </div>
+
+        <!-- BALANCE DISPLAY -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Summary</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-lg font-semibold">Income</h3>
+                    <p id="totalIncome" class="text-green-600 text-2xl font-bold">₱0</p>
+                </div>
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-lg font-semibold">Expenses</h3>
+                    <p id="totalExpense" class="text-red-600 text-2xl font-bold">₱0</p>
+                </div>
+                <div class="p-4 border rounded-lg">
+                    <h3 class="text-lg font-semibold">Balance</h3>
+                    <p id="totalBalance" class="text-blue-600 text-2xl font-bold">₱0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY TABLE -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">History</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="table-head">Type</th>
+                            <th class="table-head">Category</th>
+                            <th class="table-head">Amount</th>
+                            <th class="table-head">Date</th>
+                            <th class="table-head">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <H5> FAJARDO, FERANIL, TOLENTINO</H5>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+</body>
+</html>
